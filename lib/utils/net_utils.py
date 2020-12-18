@@ -304,23 +304,24 @@ def save_model(net, optim, scheduler, recorder, epoch, model_dir):
 
 def load_network(net, model_dir, resume=True, epoch=-1, strict=True):
     if not resume:
-        return 0
+        return 0, ''
 
     if not os.path.exists(model_dir):
-        return 0
+        return 0, ''
 
     pths = [int(pth.split('.')[0]) for pth in os.listdir(model_dir) if 'pth' in pth]
     if len(pths) == 0:
-        return 0
+        return 0, ''
     if epoch == -1:
         pth = max(pths)
     else:
         pth = epoch
-    print('Load model: {}'.format(os.path.join(model_dir, '{}.pth'.format(pth))))
-    pretrained_model = torch.load(os.path.join(model_dir, '{}.pth'.format(pth)))
+    model_file_name = os.path.join(model_dir, '{}.pth'.format(pth))
+    print('Load model: {}'.format(model_file_name))
+    pretrained_model = torch.load(model_file_name)
     net.load_state_dict(pretrained_model['net'], strict=strict)
 
-    return pretrained_model['epoch'] + 1
+    return pretrained_model['epoch'] + 1, model_file_name
 
 
 def remove_net_prefix(net, prefix):

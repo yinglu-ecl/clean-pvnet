@@ -14,6 +14,7 @@ def train(cfg, network):
     optimizer = make_optimizer(cfg, network)
     scheduler = make_lr_scheduler(cfg, optimizer)
     recorder = make_recorder(cfg)
+    cfg.training = True
     evaluator = make_evaluator(cfg)
 
     begin_epoch = load_model(network, optimizer, scheduler, recorder, cfg.model_dir, resume=cfg.resume)
@@ -32,8 +33,10 @@ def train(cfg, network):
             save_model(network, optimizer, scheduler, recorder, epoch, cfg.model_dir)
 
         if (epoch + 1) % cfg.eval_ep == 0:
+            cfg.current_epoch = epoch
             trainer.val(epoch, val_loader, evaluator, recorder)
 
+    evaluator.log_finish()
     return network
 
 
@@ -43,6 +46,7 @@ def test(cfg, network):
     evaluator = make_evaluator(cfg)
     epoch = load_network(network, cfg.model_dir, resume=cfg.resume, epoch=cfg.test.epoch)
     trainer.val(epoch, val_loader, evaluator)
+    evaluator.log_finish()
 
 
 def main():

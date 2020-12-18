@@ -76,6 +76,7 @@ class Resnet18(nn.Module):
             output.update({'mask': mask, 'kpt_2d': kpt_2d})
 
     def forward(self, x, feature_alignment=False):
+        # from IPython import embed; embed()
         x2s, x4s, x8s, x16s, x32s, xfc = self.resnet18_8s(x)
 
         fm=self.conv8s(torch.cat([xfc,x8s],1))

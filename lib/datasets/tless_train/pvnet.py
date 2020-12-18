@@ -39,7 +39,9 @@ class Dataset(data.Dataset):
 
         self.coco = COCO(ann_file)
         self.img_ids = np.array(sorted(self.coco.getImgIds()))
+        self.img_ids = np.array(sorted([img_id for img_id in self.img_ids if len(self.coco.getAnnIds(imgIds=img_id))>0]))
         self.img_ids = self.img_ids[::3] if split == 'mini' else self.img_ids
+        print('data loaded {}'.format(len(self.img_ids)))
 
         self.bg_paths = np.array(glob.glob('data/sun/JPEGImages/*.jpg'))
 
@@ -53,9 +55,12 @@ class Dataset(data.Dataset):
         anno = self.coco.loadAnns(ann_ids)[0]
 
         path = self.coco.loadImgs(int(img_id))[0]['file_name']
+        # print('loading image {}'.format(path))
         inp = cv2.imread(path)
         kpt_2d = np.concatenate([anno['fps_2d'], [anno['center_2d']]], axis=0)
         mask = pvnet_data_utils.read_tless_mask(anno['type'], anno['mask_path'])
+        # print('loading mask file: {}, anno type: {}'.format(anno['mask_path'], anno['type']))
+        # print('loaded mask: {}, {}'.format(mask.shape, np.unique(mask)))
 
         rot = get_rot(index)
         inp, _ = tless_train_utils.rotate_image(inp, rot, get_rot=True)
@@ -106,6 +111,7 @@ class Dataset(data.Dataset):
 
     def __getitem__(self, index):
         # index = np.random.randint(len(self.img_ids))
+        # print('get item {}/{}'.format(index, len(self.img_ids)))
         img_id = self.img_ids[index]
         img, kpt_2d, mask, bbox = self.read_data(img_id, index)
         img, kpt_2d, mask, bbox = self.get_training_img(img, kpt_2d, mask)

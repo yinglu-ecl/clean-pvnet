@@ -73,3 +73,9 @@ def read_tless_mask(ann_type, path):
     elif ann_type == 'render':
         depth = np.asarray(Image.open(path))
         return (depth != 65535).astype(np.uint8)
+    elif ann_type == 'syn_photo_real':
+        mask = np.asarray(Image.open(path))
+        mask = mask / np.max(mask)
+        return mask.astype(np.uint8)
+    else:
+        raise ValueError('Unknown annotation type: {}'.format(ann_type))

@@ -51,6 +51,27 @@ class DatasetCatalog(object):
             'ann_file': 'data/cache/tless_pose/{}/train.json'.format(cfg.cls_type),
             'split': 'train'
         },
+        'TlessSynPhotoPoseTrain': {
+            'id': 'tless_train',
+            'ann_file': 'data/cache/tless_syn_photo_real_annos/train_{:02d}.json'.format(int(cfg.cls_type)),
+            'split': 'train'
+        },
+        'TlessSynPhotoPoseVal': {
+            'id': 'tless_val',
+            'det_file': 'data/cache/tless_syn_photo_real_gt_dets/val_{:02d}.json'.format(int(cfg.cls_type)),
+            'ann_file': 'data/cache/tless_syn_photo_real_annos/val_{:02d}.json'.format(int(cfg.cls_type)),
+            'det_gt_file': 'data/cache/tless_syn_photo_real_gt_dets/val_{:02d}.json'.format(int(cfg.cls_type)),
+            'obj_id': cfg.cls_type,
+            'split': 'val'
+        },
+        'TlessSynPhotoPoseTest': {
+            'id': 'tless_test',
+            'det_file': 'data/cache/tless_syn_photo_real_gt_dets/test_{:02d}.json'.format(int(cfg.cls_type)),
+            'ann_file': 'data/cache/tless_syn_photo_real_annos/test_{:02d}.json'.format(int(cfg.cls_type)),
+            'det_gt_file': 'data/cache/tless_syn_photo_real_gt_dets/test_{:02d}.json'.format(int(cfg.cls_type)),
+            'obj_id': cfg.cls_type,
+            'split': 'test'
+        },
         'TlessPoseMini': {
             'id': 'tless_test',
             'det_file': 'data/cache/tless_ct/results.json',
@@ -62,7 +83,7 @@ class DatasetCatalog(object):
         'TlessPoseTest': {
             'id': 'tless_test',
             'det_file': 'data/cache/tless_ct/results.json',
-            'ann_file': 'data/cache/tless_pose/test.json',
+            'ann_file': 'data/cache/tless_pose/test_with_vis_percent.json',
             'det_gt_file': 'data/tless/test_primesense/test.json',
             'obj_id': cfg.cls_type,
             'split': 'test'

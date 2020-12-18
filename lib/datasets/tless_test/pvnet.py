@@ -41,13 +41,14 @@ class Dataset(data.Dataset):
             self.path_to_img_id = {}
             for img_data in self.coco_det_gt.dataset['images']:
                 self.path_to_img_id[img_data['rgb_path']] = img_data['id']
+        else:
+            self.coco_det = CocoDet(det_file)
+            det_img_ids = self.coco_det.getImgIds(self.obj_id)
 
-        self.coco_det = CocoDet(det_file)
         self.coco = COCO(ann_file)
         self.obj_id = int(obj_id)
 
         gt_img_ids = self.coco.getImgIds(catIds=[self.obj_id])
-        det_img_ids = self.coco_det.getImgIds(self.obj_id)
 
         if cfg.test.det_gt:
             self.anns = np.array(gt_img_ids)
@@ -55,6 +56,7 @@ class Dataset(data.Dataset):
             self.anns = np.array(list(set(gt_img_ids).intersection(det_img_ids)))
 
         self.anns = self.anns[::3] if split == 'mini' else self.anns
+        # from IPython import embed; embed()
 
     def read_data(self, img_id):
         path = self.coco.loadImgs(int(img_id))[0]['file_name']

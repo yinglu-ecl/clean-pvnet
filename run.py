@@ -50,7 +50,7 @@ def run_network():
         with torch.no_grad():
             torch.cuda.synchronize()
             start = time.time()
-            network(batch['inp'], batch)
+            network(batch['inp'])
             torch.cuda.synchronize()
             total_time += time.time() - start
     print(total_time / len(data_loader))
@@ -67,17 +67,21 @@ def run_evaluate():
     torch.manual_seed(0)
 
     network = make_network(cfg).cuda()
-    load_network(network, cfg.model_dir, epoch=cfg.test.epoch)
+    _, model_file_name = load_network(network, cfg.model_dir, epoch=cfg.test.epoch)
+    cfg.current_model_file = model_file_name
     network.eval()
 
     data_loader = make_data_loader(cfg, is_train=False)
+    cfg.training = False
     evaluator = make_evaluator(cfg)
+    # from IPython import embed; embed()
     for batch in tqdm.tqdm(data_loader):
         inp = batch['inp'].cuda()
         with torch.no_grad():
             output = network(inp)
-        evaluator.evaluate(output, batch)
+        evaluator.evaluate(output, batch, debug='/media/ying/DATA/ubuntu/GitData/output/tempo_output')
     evaluator.summarize()
+    evaluator.log_finish()
 
 
 def run_visualize():
@@ -213,35 +217,13 @@ def run_render():
 
     plt.imshow(depth)
     plt.show()
-
+    
 
 def run_custom():
     from tools import handle_custom_dataset
     data_root = 'data/custom'
     handle_custom_dataset.sample_fps_points(data_root)
     handle_custom_dataset.custom_to_coco(data_root)
-
-
-def run_detector_pvnet():
-    from lib.networks import make_network
-    from lib.datasets import make_data_loader
-    from lib.utils.net_utils import load_network
-    import tqdm
-    import torch
-    from lib.visualizers import make_visualizer
-
-    network = make_network(cfg).cuda()
-    network.eval()
-
-    data_loader = make_data_loader(cfg, is_train=False)
-    visualizer = make_visualizer(cfg)
-    for batch in tqdm.tqdm(data_loader):
-        for k in batch:
-            if k != 'meta':
-                batch[k] = batch[k].cuda()
-        with torch.no_grad():
-            output = network(batch['inp'], batch)
-        visualizer.visualize(output, batch)
 
 
 if __name__ == '__main__':

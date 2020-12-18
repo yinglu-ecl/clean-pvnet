@@ -5,6 +5,7 @@ from torch import nn
 import torch
 from imgaug import augmenters as iaa
 from lib.config import cfg
+import os
 
 
 def gaussian_radius(det_size, min_overlap=0.7):
@@ -394,4 +395,3 @@ def box_iou(box1, box2):
 
     iou = inter / (area1[:, None] + area2 - inter)
     return iou
-
